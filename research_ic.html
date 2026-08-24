@@ -1,0 +1,1382 @@
+<title>Cameras on the Care Team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+
+<style>
+  :root {
+    --bg: #eaeeed;
+    --surface: #ffffff;
+    --surface-2: #f4f7f6;
+    --ink: #0f1a1c;
+    --ink-soft: #2b3c3e;
+    --muted: #55696b;
+    --line: #cfdcda;
+    --line-soft: #e2eae9;
+    --accent: #0d6b68;
+    --accent-ink: #095350;
+    --accent-wash: #d9eae8;
+    --signal: #9c2b4e;
+    --signal-wash: #f6e0e6;
+    --amber: #85601a;
+    --amber-wash: #f4e9d2;
+    --shadow: 0 1px 2px rgba(15, 26, 28, .06), 0 8px 24px -16px rgba(15, 26, 28, .35);
+    --maxw: 1120px;
+    --prose: 68ch;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0a1113;
+      --surface: #101c1e;
+      --surface-2: #152426;
+      --ink: #e3ecea;
+      --ink-soft: #c6d5d3;
+      --muted: #8ba1a1;
+      --line: #22383a;
+      --line-soft: #1a2c2e;
+      --accent: #4ec8bd;
+      --accent-ink: #7fdbd2;
+      --accent-wash: #10302f;
+      --signal: #ef8aa6;
+      --signal-wash: #35171f;
+      --amber: #dcae56;
+      --amber-wash: #33290f;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 12px 32px -20px rgba(0, 0, 0, .9);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a1113;
+    --surface: #101c1e;
+    --surface-2: #152426;
+    --ink: #e3ecea;
+    --ink-soft: #c6d5d3;
+    --muted: #8ba1a1;
+    --line: #22383a;
+    --line-soft: #1a2c2e;
+    --accent: #4ec8bd;
+    --accent-ink: #7fdbd2;
+    --accent-wash: #10302f;
+    --signal: #ef8aa6;
+    --signal-wash: #35171f;
+    --amber: #dcae56;
+    --amber-wash: #33290f;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 12px 32px -20px rgba(0, 0, 0, .9);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- rails ---------- */
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 1.5rem; }
+  .prose { max-width: var(--prose); }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    border-bottom: 1px solid var(--line);
+    background:
+      linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .masthead::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(90deg, var(--line-soft) 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(0deg, var(--line-soft) 0 1px, transparent 1px 64px);
+    opacity: .55;
+    pointer-events: none;
+  }
+  .masthead-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    padding: 3.5rem 0 2.6rem;
+  }
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .72rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem 1rem;
+    align-items: center;
+  }
+  .eyebrow span:not(:first-child)::before {
+    content: "·";
+    margin-right: 1rem;
+    color: var(--muted);
+  }
+  h1 {
+    font-family: "Newsreader", Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(2.5rem, 6vw, 4.2rem);
+    line-height: 1.02;
+    letter-spacing: -.02em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  h1 em { font-style: italic; color: var(--accent); }
+  .standfirst {
+    font-family: "Newsreader", Georgia, serif;
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .meta-cell { background: var(--surface); padding: .85rem 1rem; }
+  .meta-cell dt {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .65rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 .3rem;
+  }
+  .meta-cell dd {
+    margin: 0;
+    font-size: .95rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- nav ---------- */
+  nav.toc {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .toc-scroll {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    padding: .7rem 1.5rem;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    scrollbar-width: thin;
+  }
+  .toc-scroll a {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .72rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--muted);
+    text-decoration: none;
+    padding-bottom: .1rem;
+    border-bottom: 1px solid transparent;
+  }
+  .toc-scroll a:hover, .toc-scroll a:focus-visible { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ---------- sections ---------- */
+  section { padding: 3.2rem 0 .5rem; scroll-margin-top: 3.5rem; }
+  section + section { border-top: 1px solid var(--line-soft); }
+  h2 {
+    font-family: "Newsreader", Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(1.7rem, 3.4vw, 2.4rem);
+    line-height: 1.15;
+    letter-spacing: -.015em;
+    margin: 0 0 .3rem;
+    text-wrap: balance;
+  }
+  .kicker {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .68rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 .8rem;
+  }
+  h3 {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 1.06rem;
+    font-weight: 600;
+    letter-spacing: -.005em;
+    margin: 2.2rem 0 .5rem;
+  }
+  h4 {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .74rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 1.6rem 0 .5rem;
+    font-weight: 600;
+  }
+  p { margin: 0 0 1rem; }
+  section > .wrap > p, .prose p { max-width: var(--prose); }
+  a { color: var(--accent-ink); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, .toc-scroll a:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  ul, ol { max-width: var(--prose); padding-left: 1.15rem; margin: 0 0 1rem; }
+  li { margin-bottom: .45rem; }
+  li::marker { color: var(--accent); }
+  strong { font-weight: 600; }
+  .lede { font-size: 1.06rem; color: var(--ink-soft); }
+
+  /* ---------- findings ---------- */
+  .findings {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin: 1.6rem 0 .5rem;
+  }
+  .finding { background: var(--surface); padding: 1.1rem 1.15rem 1.2rem; }
+  .finding .n {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .68rem;
+    letter-spacing: .1em;
+    color: var(--accent);
+    display: block;
+    margin-bottom: .4rem;
+  }
+  .finding p { margin: 0; font-size: .92rem; line-height: 1.55; max-width: none; }
+  .finding p strong { display: block; margin-bottom: .25rem; font-size: .97rem; }
+
+  /* ---------- layer blocks ---------- */
+  .layer {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 0 1.4rem;
+    padding: 1.4rem 0;
+    border-top: 1px solid var(--line);
+  }
+  .layer:last-of-type { border-bottom: 1px solid var(--line); }
+  .layer-num {
+    font-family: "Newsreader", Georgia, serif;
+    font-size: 2.6rem;
+    line-height: 1;
+    color: var(--accent);
+    font-variant-numeric: lining-nums;
+  }
+  .layer h3 { margin-top: 0; }
+  .layer p { margin-bottom: .5rem; }
+  @media (max-width: 620px) {
+    .layer { grid-template-columns: 1fr; gap: .3rem; }
+    .layer-num { font-size: 1.6rem; }
+  }
+
+  /* ---------- tables ---------- */
+  .table-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    margin: 1.2rem 0 1.6rem;
+    box-shadow: var(--shadow);
+  }
+  table { border-collapse: collapse; width: 100%; min-width: 780px; font-size: .875rem; }
+  caption {
+    caption-side: top;
+    text-align: left;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .68rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: .8rem 1rem .55rem;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  thead th {
+    text-align: left;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .66rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--muted);
+    padding: .65rem 1rem;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  tbody td { padding: .7rem 1rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; line-height: 1.45; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--surface-2); }
+  td.name { font-weight: 600; white-space: nowrap; }
+  td.name small { display: block; font-weight: 400; color: var(--muted); font-size: .76rem; white-space: normal; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* ---------- chips ---------- */
+  .chip {
+    display: inline-block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .64rem;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    padding: .17rem .45rem;
+    border-radius: 2px;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    font-weight: 500;
+  }
+  .chip-dev { background: var(--accent-wash); color: var(--accent-ink); border-color: var(--accent); }
+  .chip-scale { background: var(--surface-2); color: var(--ink-soft); border-color: var(--line); }
+  .chip-growth { background: var(--amber-wash); color: var(--amber); border-color: var(--amber); }
+  .chip-early { background: var(--signal-wash); color: var(--signal); border-color: var(--signal); }
+  .chip-res { background: transparent; color: var(--muted); border-color: var(--line); border-style: dashed; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: .5rem 1.1rem; margin: .8rem 0 0; font-size: .8rem; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: .4rem; }
+
+  /* ---------- callout ---------- */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+    padding: 1rem 1.2rem;
+    margin: 1.4rem 0;
+    max-width: var(--prose);
+    box-shadow: var(--shadow);
+  }
+  .callout.warn { border-left-color: var(--signal); }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout h4 { margin-top: 0; color: var(--accent); }
+  .callout.warn h4 { color: var(--signal); }
+
+  /* ---------- stats ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin: 1.5rem 0;
+  }
+  .stat { background: var(--surface); padding: 1rem 1.1rem; }
+  .stat .v {
+    font-family: "Newsreader", Georgia, serif;
+    font-size: 2rem;
+    line-height: 1.05;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums lining-nums;
+    display: block;
+  }
+  .stat .l { font-size: .82rem; color: var(--muted); margin-top: .35rem; display: block; line-height: 1.4; }
+
+  /* ---------- geo cards ---------- */
+  .geo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin: 1.4rem 0;
+  }
+  .geo-card { background: var(--surface); padding: 1.15rem 1.2rem 1.3rem; }
+  .geo-card h3 { margin: 0 0 .1rem; font-size: 1rem; }
+  .geo-card .role {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .66rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: .6rem;
+  }
+  .geo-card p { font-size: .89rem; margin-bottom: .6rem; max-width: none; line-height: 1.55; }
+  .geo-card p:last-child { margin-bottom: 0; }
+
+  /* ---------- details ---------- */
+  details {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    padding: .8rem 1.1rem;
+    margin: 1rem 0;
+  }
+  details[open] { padding-bottom: 1rem; }
+  summary {
+    cursor: pointer;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .74rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    font-weight: 600;
+  }
+  details p, details ul { margin-top: .8rem; }
+
+  /* ---------- sources ---------- */
+  .sources { columns: 2 300px; column-gap: 2rem; font-size: .82rem; margin-top: 1rem; }
+  .sources li { break-inside: avoid; margin-bottom: .55rem; color: var(--muted); }
+  .sources a { text-decoration: none; }
+  .sources a:hover { text-decoration: underline; }
+
+  footer {
+    border-top: 1px solid var(--line);
+    margin-top: 3rem;
+    padding: 2rem 0 3.5rem;
+    color: var(--muted);
+    font-size: .82rem;
+  }
+  footer p { max-width: var(--prose); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+  html { scroll-behavior: smooth; }
+</style>
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <div class="eyebrow">
+      <span>Market &amp; technology research</span>
+      <span>Compiled August 2026</span>
+      <span>Desk research — open sources</span>
+    </div>
+    <h1>Cameras on the <em>Care Team</em></h1>
+    <p class="standfirst">
+      Who is putting sensors in operating rooms, ICUs and wards to watch how clinical teams actually
+      work — to audit performance, and to take documentation off their hands. Vendors, maturity,
+      regulatory posture, research base and regional dynamics.
+    </p>
+    <dl class="meta-grid">
+      <div class="meta-cell"><dt>Segments mapped</dt><dd>3 core + 6 adjacent</dd></div>
+      <div class="meta-cell"><dt>Named organisations</dt><dd>50+</dd></div>
+      <div class="meta-cell"><dt>Regions covered</dt><dd>9</dd></div>
+      <div class="meta-cell"><dt>Regulatory regimes</dt><dd>8</dd></div>
+    </dl>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <div class="toc-scroll">
+    <a href="#summary">Summary</a>
+    <a href="#map">Market map</a>
+    <a href="#layer1">Layer 1 · Audit</a>
+    <a href="#layer2">Layer 2 · Offload</a>
+    <a href="#layer3">Layer 3 · Adjacent</a>
+    <a href="#maturity">Maturity &amp; FDA</a>
+    <a href="#geo">Geography</a>
+    <a href="#regulation">Regulation</a>
+    <a href="#evidence">Evidence</a>
+    <a href="#research">Research</a>
+    <a href="#whitespace">Whitespace</a>
+    <a href="#business">Business models</a>
+    <a href="#caveats">Caveats</a>
+    <a href="#sources">Sources</a>
+  </div>
+</nav>
+
+<main>
+
+<section id="summary">
+  <div class="wrap">
+    <p class="kicker">Executive summary</p>
+    <h2>Two markets that look alike and behave completely differently</h2>
+    <p class="lede">
+      Your layer 1 (watch the team to improve how the team works) and layer 2 (watch the room so the
+      team writes less) use nearly the same hardware and much of the same computer vision. They are
+      sold to different buyers, priced differently, regulated differently, and face completely
+      different levels of staff resistance. Layer 2 is a scaling commercial market. Layer 1 is a
+      small, evidence-rich, politically loaded niche.
+    </p>
+
+    <div class="findings">
+      <div class="finding">
+        <span class="n">FINDING 01</span>
+        <p><strong>Team-performance auditing is a one-horse commercial race.</strong>
+        Surgical Safety Technologies' OR Black Box is effectively the only pure-play product that records
+        a whole clinical team and analyses how it operated. Everyone else either narrows to the endoscope
+        video (Theator, Medtronic) or widens to room efficiency (Apella, Caresyntax).</p>
+      </div>
+      <div class="finding">
+        <span class="n">FINDING 02</span>
+        <p><strong>Workload-offload is where the money went.</strong>
+        Virtual nursing / ambient patient rooms crossed into mainstream procurement: AvaSure reports 1,100+
+        hospitals, Artisight 400+ hospitals across 30 systems, and Stryker bought care.ai outright in 2024.
+        The pitch is nurse-hours and fall rates, not team science.</p>
+      </div>
+      <div class="finding">
+        <span class="n">FINDING 03</span>
+        <p><strong>"FDA approved" mostly does not apply.</strong>
+        Most of these systems are deliberately built as non-device workflow/analytics tools. The
+        clearances that do exist cluster on vital-sign extraction (Oxehealth De Novo, 2021) — not on
+        activity recognition. Treat FDA status as a design decision, not a quality grade.</p>
+      </div>
+      <div class="finding">
+        <span class="n">FINDING 04</span>
+        <p><strong>The staff, not the patient, are the consent problem.</strong>
+        In documented OR Black Box rollouts nurses declined consent at higher rates than physicians,
+        and ~60 workers at one US hospital formally objected. In the EU, AI Act Article 5 bans workplace
+        emotion inference outright — a hard ceiling on "how stressed was the team" analytics.</p>
+      </div>
+      <div class="finding">
+        <span class="n">FINDING 05</span>
+        <p><strong>Academia is ahead of industry on scene understanding.</strong>
+        4D-OR, MM-OR and EgoExOR give multi-view, multimodal, scene-graph-annotated whole-OR data.
+        No commercial product ships anything close to that level of semantic modelling of the team.</p>
+      </div>
+      <div class="finding">
+        <span class="n">FINDING 06</span>
+        <p><strong>Asia is building the same thing from the facility side.</strong>
+        Japan (Konica Minolta HitomeQ), Korea (Samsung Medical Center smart rooms), Taiwan (Foxconn
+        digital twins + nursing robots) and China (AI hospitals, access/PPE compliance vision) are
+        deploying under operations and eldercare budgets, not surgical-safety budgets.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="map">
+  <div class="wrap">
+    <p class="kicker">Taxonomy</p>
+    <h2>The market map, using your three layers — plus the third you asked me to find</h2>
+    <p>
+      Your framing holds up well. I've kept your layers 1 and 2 as written, and layer 3 is where I've
+      put the adjacent categories that use the same sensing stack but are bought for different reasons.
+      The useful distinction between layer 1 and 2 is <em>who the subject is</em>: layer 1's subject is the
+      staff, layer 2's subject is the patient and the record. That single difference drives the
+      regulation, the consent politics and the sales cycle.
+    </p>
+
+    <div class="layer">
+      <div class="layer-num">01</div>
+      <div>
+        <h3>Team-performance audit &mdash; the subject is the staff</h3>
+        <p>
+          Record the whole room (video, audio, device telemetry, vitals), reconstruct what the team did,
+          and feed it back as safety and process improvement. Sold to surgical quality &amp; safety
+          leadership, perioperative directors, risk management. Value is measured in errors, near-misses,
+          distractions, protocol deviations, case-time variance.
+        </p>
+        <p>
+          <strong>Buyer:</strong> Chief of Surgery / Quality &amp; Safety. <strong>Blocker:</strong> staff
+          consent, unions, discoverability in litigation. <strong>Maturity:</strong> commercial but narrow;
+          tens of hospitals, not thousands.
+        </p>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-num">02</div>
+      <div>
+        <h3>Workload offload &mdash; the subject is the patient and the record</h3>
+        <p>
+          Sensors in the patient room or OR that automatically log events, extract vitals, detect falls
+          and elopement, run virtual sitting/nursing, and increasingly write into the EHR without a human
+          typing. Value is measured in nurse-hours returned, sitter FTEs avoided, fall rate, length of stay,
+          documentation lag.
+        </p>
+        <p>
+          <strong>Buyer:</strong> CNO / CNIO, CFO. <strong>Blocker:</strong> integration and alarm fatigue,
+          not politics. <strong>Maturity:</strong> mainstream procurement, consolidating fast.
+        </p>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-num">03</div>
+      <div>
+        <h3>Adjacent uses of the same stack &mdash; the answer to "anything else?"</h3>
+        <p>
+          Six categories reuse the same cameras and often the same vendors, and they matter because they
+          are frequently how the sensing gets funded in the first place: <strong>compliance &amp; infection
+          control</strong> (hand hygiene, PPE, sterile field), <strong>throughput &amp; capacity</strong>
+          (OR turnover, room state, RTLS replacement), <strong>staff safety</strong> (workplace violence,
+          weapons, ergonomics), <strong>training &amp; credentialing</strong> (video review, remote
+          proctoring), <strong>evidence generation for industry</strong> (device makers and insurers buying
+          OR data), and <strong>research infrastructure</strong> (datasets and benchmarks). Detail in
+          <a href="#layer3">Layer 3</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="layer1">
+  <div class="wrap">
+    <p class="kicker">Layer 1</p>
+    <h2>Who records the team to study how the team operated</h2>
+    <p>
+      This is the smallest and most interesting segment. Only one company built the full "black box"
+      thesis; the rest reached the same room from adjacent starting points — the laparoscope feed, the
+      OR schedule, the device stack.
+    </p>
+
+    <div class="table-scroll">
+      <table>
+        <caption>Team-performance and OR audit vendors</caption>
+        <thead>
+          <tr>
+            <th scope="col">Company</th>
+            <th scope="col">Base</th>
+            <th scope="col">What it actually captures</th>
+            <th scope="col">Maturity</th>
+            <th scope="col">Regulatory posture</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name">Surgical Safety Technologies<small>OR Black Box®</small></td>
+            <td>Toronto, CA</td>
+            <td>Wide-angle room video + audio + laparoscope + device telemetry + patient vitals; auto de-identification (face blur, voice distortion); analyses distractions, deviations, errors, team events.</td>
+            <td><span class="chip chip-growth">Growth startup</span><br><small>US$15M Series A, 2023 (USVP, Santé). Reported 24+ facilities: Stanford, Duke, Mayo, Mount Sinai, Northwell, UT Southwestern, Mass General Brigham.</small></td>
+            <td>Quality-improvement/analytics tool, not marketed as a diagnostic device. Deployment gate is IRB + staff consent + data-retention policy (commonly 30-day erase), not FDA.</td>
+          </tr>
+          <tr>
+            <td class="name">Apella<small>OR ambient AI</small></td>
+            <td>San Francisco, US</td>
+            <td>Ceiling cameras + ambient AI reading room state, phase, and staff/patient presence; oriented to schedule capacity, turnover, case-length prediction, and increasingly clinical quality.</td>
+            <td><span class="chip chip-growth">Growth startup</span><br><small>US$80M Series B, Jan 2026 (HighlandX; Houston Methodist participating). ~US$115M total.</small></td>
+            <td>Operational analytics; non-device positioning.</td>
+          </tr>
+          <tr>
+            <td class="name">Caresyntax</td>
+            <td>Berlin, DE / Boston, US</td>
+            <td>OR integration platform: video from endoscopes and room cameras, device data, EMR context; risk analytics for hospitals, device makers and insurers. Claims 6,000+ digitised theatres.</td>
+            <td><span class="chip chip-scale">Scaled / late stage</span><br><small>US$207M+ raised since 2013.</small></td>
+            <td>Describes platform as "medical grade"; components fall under EU MDR and US device rules depending on module.</td>
+          </tr>
+          <tr>
+            <td class="name">Theator</td>
+            <td>Tel Aviv, IL / Palo Alto, US</td>
+            <td>Surgical <em>video</em> intelligence — phase, critical view of safety, milestones, surgeon-level analytics. Inside-the-body, not room-level team behaviour.</td>
+            <td><span class="chip chip-growth">Growth startup</span></td>
+            <td>Secondary sources report FDA clearance (laparoscopic cholecystectomy, 2023, expanding to appendectomy / hernia / sleeve). <strong>I could not confirm this on FDA or company primary sources</strong> — verify before relying on it.</td>
+          </tr>
+          <tr>
+            <td class="name">Medtronic Touch Surgery™ Ecosystem</td>
+            <td>US / UK</td>
+            <td>Automatic capture and de-identification of surgical video, 14+ AI algorithms for workflow / instrument / anatomy detection, live streaming, and Touch Surgery Aide for in-procedure AI on NVIDIA hardware. Reported 1,500+ ORs.</td>
+            <td><span class="chip chip-scale">Big-medtech program</span></td>
+            <td>Regulated per component under existing Medtronic device programs.</td>
+          </tr>
+          <tr>
+            <td class="name">Stryker (care.ai) / Karl Storz / Proximie</td>
+            <td>US / DE / UK</td>
+            <td>Adjacent OR camera and connected-OR programs — room status, telepresence, capture and streaming; team analytics is not the primary product.</td>
+            <td><span class="chip chip-scale">Strategic incumbents</span></td>
+            <td>Mixed; device-adjacent.</td>
+          </tr>
+          <tr>
+            <td class="name">Academic OR-analytics groups<small>CAMMA Strasbourg, TUM/Navab, Stanford PAC</small></td>
+            <td>FR / DE / US</td>
+            <td>Multi-view whole-room modelling: 3D pose of every person, role recognition, semantic scene graphs, surgical phase. See <a href="#research">Research</a>.</td>
+            <td><span class="chip chip-res">Research</span></td>
+            <td>IRB / ethics committee; no market authorisation.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <h4>The structural insight</h4>
+      <p>
+        There is a real gap between "record the team and give safety leadership a case review" (SST, tiny
+        market, hard sale) and "read the room to make the schedule work" (Apella, bigger market, easy sale).
+        The efficiency framing is what gets cameras into the OR; the team-safety analytics ride in behind it.
+        Any new entrant that leads with performance auditing will meet the consent wall described in
+        <a href="#regulation">Regulation</a>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="layer2">
+  <div class="wrap">
+    <p class="kicker">Layer 2</p>
+    <h2>Who puts cameras in to take work off the team</h2>
+    <p>
+      This segment has crossed from pilot to platform procurement. The trend through 2025–26 is from
+      passive monitoring (a remote human watching feeds) to autonomous documentation — the system writing
+      into the EHR by itself.
+    </p>
+
+    <div class="table-scroll">
+      <table>
+        <caption>Workload-offload / ambient clinical monitoring vendors</caption>
+        <thead>
+          <tr>
+            <th scope="col">Company</th>
+            <th scope="col">Base</th>
+            <th scope="col">What it offloads</th>
+            <th scope="col">Maturity</th>
+            <th scope="col">Regulatory posture</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name">Artisight</td>
+            <td>Chicago, US</td>
+            <td>Multi-sensor smart rooms: virtual nursing, virtual sitting, fall prevention, room state — and, announced 2025, autonomous documentation of <em>OR procedures</em> into the EHR via computer vision.</td>
+            <td><span class="chip chip-scale">Scaled commercial</span><br><small>400+ hospitals, 30 health systems (company figures).</small></td>
+            <td>Workflow + documentation; non-device positioning for the CV documentation layer.</td>
+          </tr>
+          <tr>
+            <td class="name">care.ai <span class="chip chip-dev">acquired</span></td>
+            <td>Orlando, US</td>
+            <td>Ambient intelligence smart rooms, virtual care, automation of nursing tasks.</td>
+            <td><span class="chip chip-scale">Acquired by Stryker, Aug 2024</span><br><small>Now Stryker SmartHospital platform.</small></td>
+            <td>Under a device manufacturer's QMS; individual features non-device.</td>
+          </tr>
+          <tr>
+            <td class="name">AvaSure</td>
+            <td>Michigan, US</td>
+            <td>TeleSitter virtual sitting → virtual nursing; AI fall risk; acquired Nurse Disrupted (2025); ambient documentation via Suki partnership (2025); Epic Toolbox designation (Nov 2025).</td>
+            <td><span class="chip chip-scale">Category incumbent</span><br><small>1,100+ hospitals.</small></td>
+            <td>Predominantly non-device; documented fall-rate reductions &gt;50% in customer studies.</td>
+          </tr>
+          <tr>
+            <td class="name">LookDeep Health</td>
+            <td>Silicon Valley, US</td>
+            <td>Vision AI at 1 fps in patient rooms; 2025 "aimee" agent combining sight, sound and language; publishes model transparency benchmarks (unusual and worth noting).</td>
+            <td><span class="chip chip-growth">Growth startup</span></td>
+            <td>Non-device monitoring/observation.</td>
+          </tr>
+          <tr>
+            <td class="name">Oxehealth<small>Oxevision</small></td>
+            <td>Oxford, UK</td>
+            <td>Infrared camera in the bedroom: contact-free pulse and breathing rate, activity and sleep insight, night-time checks without waking the patient. Heavy NHS mental-health deployment.</td>
+            <td><span class="chip chip-dev">Regulated device</span><br><small>Two Class IIa software modules in Europe; ~1 in 3 NHS England mental-health trusts.</small></td>
+            <td><strong>FDA De Novo (Mar 2021)</strong> for Oxehealth Vital Signs — creating a new category for vision-based contact-free vitals. The clearest genuine "FDA-authorised" case in this landscape.</td>
+          </tr>
+          <tr>
+            <td class="name">Teton.ai</td>
+            <td>Copenhagen, DK</td>
+            <td>Anonymised 3D "digital twin" of residents, staff and rooms; sleep tracking, mobilisation and pressure-ulcer prompts, fall warnings, and automatic documentation of care activities. Edge/closed-system processing, no personal data centralised.</td>
+            <td><span class="chip chip-growth">Growth startup</span><br><small>€4.8M seed 2023 → US$20M Series A; hospitals + eldercare, DK/EU/US.</small></td>
+            <td>Privacy-by-design architecture is the deliberate answer to GDPR; device classification depends on module.</td>
+          </tr>
+          <tr>
+            <td class="name">VirtuSense · Inspiren (AUGi) · Ouva · Caregility · hellocare.ai</td>
+            <td>US</td>
+            <td>Fall/bed-exit prediction, elopement, virtual sitting, ambient room intelligence; hellocare.ai landed large 2026 deployments (Ardent Health, 2,000+ rooms; Cooper University Health Care).</td>
+            <td><span class="chip chip-growth">Growth startups</span></td>
+            <td>Mostly non-device; Caregility ships edge-based CV fall detection.</td>
+          </tr>
+          <tr>
+            <td class="name">Contact-free vitals cluster<small>Presage, Circadia, Neteera</small></td>
+            <td>US / UK / IL</td>
+            <td>Camera or radar extraction of pulse/respiration, bed-exit and motion — the measurement primitive that turns observation into a documented vital sign.</td>
+            <td><span class="chip chip-dev">FDA 510(k) cleared</span></td>
+            <td>Where FDA clearance genuinely lives in this market: vital-sign measurement, not activity understanding.</td>
+          </tr>
+          <tr>
+            <td class="name">Audio-first offload<small>Abridge, Ambience, Microsoft Dragon Copilot, Suki, Nabla</small></td>
+            <td>US</td>
+            <td>Not cameras — but the direct competitor for the same budget and the same problem. Nursing documentation entered GA with Dragon Copilot for nurses (Dec 2025); Abridge shipped nursing ambient AI.</td>
+            <td><span class="chip chip-scale">Mainstream</span><br><small>62.6% of Epic hospitals had adopted an ambient AI tool by Jun 2025 (KLAS).</small></td>
+            <td>Non-device clinical documentation.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="legend">
+      <span><span class="chip chip-dev">Regulated device</span> market authorisation exists</span>
+      <span><span class="chip chip-scale">Scaled</span> hundreds+ of sites or strategic owner</span>
+      <span><span class="chip chip-growth">Growth</span> funded, dozens of sites</span>
+      <span><span class="chip chip-early">Early</span> pilot stage</span>
+      <span><span class="chip chip-res">Research</span> academic / pre-commercial</span>
+    </div>
+
+    <div class="callout warn">
+      <h4>The competitive fact that matters most here</h4>
+      <p>
+        Audio ambient AI is winning the documentation budget first, and it is far cheaper to deploy than
+        ceiling sensors. Camera vendors are responding by claiming the things audio cannot do — falls,
+        room state, physical events, OR procedure logging. Any layer-2 thesis has to answer: what does the
+        camera see that a microphone plus the EHR cannot infer?
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="layer3">
+  <div class="wrap">
+    <p class="kicker">Layer 3</p>
+    <h2>The adjacent categories — and why they matter to the core two</h2>
+
+    <h3>Compliance and infection control</h3>
+    <p>
+      The oldest use case, and the one with the cleanest ROI story. Hand-hygiene monitoring shows the whole
+      arc: badge/sensor systems (SwipeSense, acquired into SC Johnson; Vitalacy wearables) proved hospitals
+      would buy compliance data, and vision-based versions followed — Stanford's work showed a CV algorithm
+      matching human observers at detecting dispenser use, and a 3D-CNN system has been published for fully
+      automated OR hand-hygiene monitoring. The same stack extends to PPE/attire compliance, sterile-field
+      breach detection, and instrument counting for retained-surgical-item prevention (published YOLO-based
+      models reach ~98% precision on tool detection in bench conditions; RSIs occur at ~1.3 per 10,000
+      surgeries, so this is a rare-event problem with severe consequences).
+    </p>
+
+    <h3>Throughput, capacity and room state</h3>
+    <p>
+      The commercial engine. Room-state cameras answer "is the room clean, is the patient in, has the
+      surgeon scrubbed" — replacing manual whiteboards and RTLS badges. This is Apella's core, part of
+      Artisight's and Stryker's, and it is the budget line that funds the sensors that layer 1 later uses.
+    </p>
+
+    <h3>Staff safety and workplace violence</h3>
+    <p>
+      A fast-growing and politically <em>easier</em> camera deployment, because the staff are the
+      beneficiaries rather than the subjects. AI weapons detection (Omnilert, Athena Security, Scylla,
+      IntelliSee, Actuate) is being bought against a documented problem — surveys report ~82% of nurses
+      experiencing workplace violence in a year, and OSHA data puts healthcare violence rates far above the
+      private-sector average. One multi-campus US system reported intercepting 20+ firearms and ~180 knives
+      in 2025.
+    </p>
+
+    <h3>Training, credentialing and remote proctoring</h3>
+    <p>
+      Video review for skills assessment, validated team-leader assessment tools scored from recordings,
+      and telepresence (Proximie, Medtronic live streaming). This is where recorded team performance is
+      already accepted culturally — teaching, not judging — and it is the most common wedge into a
+      reluctant department.
+    </p>
+
+    <h3>Evidence generation sold to industry</h3>
+    <p>
+      An under-discussed revenue model: OR data has buyers outside the hospital. SST's system is explicitly
+      described as evaluating medical-device effectiveness; Caresyntax sells risk analytics to device makers
+      and insurance groups. Hospitals get the platform partly subsidised; industry gets real-world
+      evidence. This also creates the sharpest governance question, because staff-derived data is flowing
+      to commercial third parties.
+    </p>
+
+    <h3>Research infrastructure</h3>
+    <p>
+      Datasets and benchmarks are a category of their own now — see <a href="#research">Research</a>. For a
+      newcomer, this is the cheapest way in: the annotated whole-OR data that industry lacks is public.
+    </p>
+  </div>
+</section>
+
+<section id="maturity">
+  <div class="wrap">
+    <p class="kicker">Regulatory decoder</p>
+    <h2>What "FDA approved" does and does not mean in this market</h2>
+    <p>
+      You asked for maturity level including FDA status. The honest answer is that <strong>the FDA question
+      is usually the wrong question</strong> for this category, and knowing why is the most useful thing in
+      this report.
+    </p>
+
+    <div class="table-scroll">
+      <table>
+        <caption>How the same camera lands in three different regulatory buckets</caption>
+        <thead>
+          <tr>
+            <th scope="col">If the product claims…</th>
+            <th scope="col">Then in the US it is…</th>
+            <th scope="col">Examples</th>
+            <th scope="col">Practical consequence</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name">"We measure a physiological parameter"<small>pulse, respiration rate</small></td>
+            <td><strong>A medical device.</strong> 510(k) or De Novo required.</td>
+            <td>Oxehealth Vital Signs (De Novo 2021), Presage SmartSpectra, Circadia C200, Neteera</td>
+            <td>Slow, expensive, defensible. Enables clinical claims and nursing-workflow substitution.</td>
+          </tr>
+          <tr>
+            <td class="name">"We detect a clinical event and alert"<small>falls, deterioration</small></td>
+            <td><strong>Grey zone.</strong> Depends on whether the clinician can independently review the basis of the recommendation.</td>
+            <td>Fall detection across AvaSure, Caregility, VirtuSense, Inspiren</td>
+            <td>Most vendors deliberately frame output as an aid to a human observer to stay non-device.</td>
+          </tr>
+          <tr>
+            <td class="name">"We analyse workflow, safety process and documentation"</td>
+            <td><strong>Not a device.</strong> Quality improvement / administrative software.</td>
+            <td>OR Black Box, Apella, Artisight OR documentation, most virtual nursing</td>
+            <td>Fast to market. The gating factors become privacy law, employment law and hospital governance — not FDA.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <h4>Read maturity this way instead</h4>
+      <p>
+        For layer 1 and most of layer 2, the meaningful maturity signals are: number of live hospital sites,
+        whether it is embedded in the EHR (Epic Toolbox designation, EHR write-back), whether peer-reviewed
+        outcome studies exist, and whether a strategic acquirer has already bought in the category
+        (Stryker/care.ai is the reference transaction).
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="geo">
+  <div class="wrap">
+    <p class="kicker">Geography</p>
+    <h2>Where each region is actually strong</h2>
+
+    <div class="geo">
+      <div class="geo-card">
+        <h3>United States</h3>
+        <span class="role">Commercial centre of gravity</span>
+        <p>
+          The volume market for both layers. Nurse shortage economics drive layer 2; malpractice and quality
+          reporting drive layer 1. Nearly all scaled vendors (Artisight, AvaSure, Apella, LookDeep,
+          VirtuSense, Inspiren, hellocare.ai) sell here first, and Stryker's care.ai acquisition set the
+          consolidation template. Also where the staff-consent fight is most visible.
+        </p>
+      </div>
+      <div class="geo-card">
+        <h3>Canada</h3>
+        <span class="role">Origin of the black-box thesis</span>
+        <p>
+          Surgical Safety Technologies is Toronto-based, and the foundational OR Black Box studies came out
+          of St Michael's Hospital. Provincial health-information law (Ontario PHIPA) plus PIPEDA governs;
+          the research culture around surgical safety here is disproportionately influential relative to
+          market size.
+        </p>
+      </div>
+      <div class="geo-card">
+        <h3>United Kingdom</h3>
+        <span class="role">Deepest real-world deployment — and the sharpest backlash</span>
+        <p>
+          Oxevision is in roughly a third of NHS England mental-health trusts, with published reductions in
+          night-time falls, assaults and self-harm. It is also the case study in what goes wrong: CQC
+          criticism over cameras seeing into bathrooms, reporting on monitoring without consent, and
+          campaign groups calling for a pause. Anyone selling ward cameras in Europe should read this
+          episode closely.
+        </p>
+      </div>
+      <div class="geo-card">
+        <h3>Continental Europe</h3>
+        <span class="role">OR integration and privacy-by-design</span>
+        <p>
+          Germany hosts Caresyntax (Berlin) and large digital-OR integration projects (Hamburg); France has
+          run national stakeholder surveys on OR audiovisual recording; Strasbourg's CAMMA lab and TUM lead
+          the research. Nordics contribute Teton.ai's edge-processing model. The binding constraints are EU
+          MDR, GDPR, works councils, and now the AI Act.
+        </p>
+      </div>
+      <div class="geo-card">
+        <h3>Israel</h3>
+        <span class="role">Surgical video AI cluster</span>
+        <p>
+          Theator is the visible name; the broader Israeli medtech-AI base supplies much of the surgical
+          computer-vision talent feeding US-facing companies. Commercial motion happens in the US market.
+        </p>
+      </div>
+      <div class="geo-card">
+        <h3>China</h3>
+        <span class="role">Infrastructure-scale, operations-framed</span>
+        <p>
+          Camera infrastructure is already ubiquitous, so the deployment question is software, not hardware.
+          Hikvision markets hospital solutions including OR/ICU access control with automated checks that
+          staff are wearing required protective clothing — i.e. staff-behaviour compliance vision shipping
+          as facility security. "AI hospital" programs and AI-in-ED design research are national priorities.
+          Regulation: NMPA had approved 154 AI-based medical devices by mid-2025 (79.9% Class III), with
+          dedicated AI review guidelines since 2019/2022; PIPL governs personal-information processing.
+          Clinical trials of AI video monitoring to predict accidental events in ICU patients are registered.
+        </p>
+      </div>
+      <div class="geo-card">
+        <h3>Japan</h3>
+        <span class="role">Eldercare-first, sensing-mature</span>
+        <p>
+          Konica Minolta's HitomeQ Care Support is the standout: ceiling near-infrared cameras with
+          silhouette-based person detection and joint/pose estimation, inferring posture and predicting
+          posture change, deployed to shift care from subjective observation to measured process. Super-aged
+          demographics make staffing offload the dominant purchase rationale, and consumer-electronics
+          incumbents rather than startups lead.
+        </p>
+      </div>
+      <div class="geo-card">
+        <h3>Korea, Taiwan, Singapore</h3>
+        <span class="role">National smart-hospital programs</span>
+        <p>
+          Samsung Medical Center opened AI smart hospital rooms (facial-recognition access, fall-detection
+          sensors, wearable vitals). Taiwan pairs hospitals with Foxconn and NVIDIA for nursing robots and
+          real-time digital twins of wards, nursing stations and corridors — the closest thing anywhere to
+          layer 1 and layer 2 fused into one system. Singapore's Tan Tock Seng smart ward and Changi's
+          deterioration prediction are government-backed showcases.
+        </p>
+      </div>
+      <div class="geo-card">
+        <h3>India</h3>
+        <span class="role">Cost-driven, non-camera sensing leads</span>
+        <p>
+          The offload problem is acute but the winning form factor so far is contactless ballistocardiography
+          under the mattress (Dozee) and tele-ICU command centres (Cloudphysician), not cameras — cheaper,
+          less bandwidth, fewer privacy frictions. Reported effects include up to 80% of nursing time saved
+          on manual vitals in non-ICU wards and earlier deterioration alerts. CDSCO regulates devices; the
+          DPDP Act governs personal data. This is the region where a low-cost vision product could
+          leapfrog, if bandwidth and consent are solved.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="regulation">
+  <div class="wrap">
+    <p class="kicker">Regulation</p>
+    <h2>The rules that decide whether you can deploy at all</h2>
+    <p>
+      For layer 1 especially, the binding law is not medical-device law. It is employment, privacy and
+      biometric law — because you are recording workers.
+    </p>
+
+    <div class="table-scroll">
+      <table>
+        <caption>Regulatory regimes by jurisdiction</caption>
+        <thead>
+          <tr>
+            <th scope="col">Jurisdiction</th>
+            <th scope="col">Device pathway</th>
+            <th scope="col">Privacy / workforce constraint</th>
+            <th scope="col">Practical effect on layer 1</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name">United States</td>
+            <td>FDA 510(k) / De Novo for measurement claims; most workflow analytics stay non-device.</td>
+            <td>HIPAA for patient data; state biometric statutes — Illinois BIPA is the litigation risk, though the Illinois Supreme Court (Mosby v. Ingalls, Nov 2023) held a narrow healthcare exclusion for biometrics collected in the course of care.</td>
+            <td>Deployable quickly, but staff recording requires local consent process, retention limits, and explicit exclusion from HR/disciplinary use — and even then expect objection letters.</td>
+          </tr>
+          <tr>
+            <td class="name">European Union</td>
+            <td>EU MDR; Class IIa typical for camera-derived vitals/activity insight.</td>
+            <td>GDPR (biometric = special category), works-council codetermination, and the <strong>AI Act</strong>: emotion inference in the workplace is a <em>prohibited practice</em> under Article 5 since 2 Feb 2025 (up to €35M or 7% of global turnover); Annex III emotion-recognition rules apply from 2 Aug 2026.</td>
+            <td>Hard ceiling. "Detect team stress/frustration/fatigue from video" is not sellable in the EU. Behaviour and event recognition remain possible; affective inference does not.</td>
+          </tr>
+          <tr>
+            <td class="name">United Kingdom</td>
+            <td>UKCA/CE; MHRA. Oxevision holds Class IIa software modules.</td>
+            <td>UK GDPR; CQC does not authorise covert intrusive surveillance; NHS England digital-technology principles; DTAC for procurement.</td>
+            <td>The Oxevision experience shows consent must be individualised and ongoing, not blanket ward policy — and that campaign and press scrutiny is a live commercial risk.</td>
+          </tr>
+          <tr>
+            <td class="name">Canada</td>
+            <td>Health Canada device licensing where a measurement claim exists.</td>
+            <td>PIPEDA + provincial health-information acts (e.g. Ontario PHIPA); labour agreements.</td>
+            <td>The de-identify-at-capture, 30-day-erase, no-HR-use model was largely worked out here.</td>
+          </tr>
+          <tr>
+            <td class="name">China</td>
+            <td>NMPA; AI medical device review guidelines (2019, revised 2022); 154 AI devices approved to Jun 2025, 79.9% Class III.</td>
+            <td>PIPL transparency obligations toward patients and staff; data-source compliance requirements in AI device review.</td>
+            <td>Institutional appetite for behavioural monitoring is comparatively high; the constraint is device-grade evidence, not social licence.</td>
+          </tr>
+          <tr>
+            <td class="name">Japan</td>
+            <td>PMDA for device claims; most eldercare monitoring sits outside the device pathway.</td>
+            <td>APPI; strong facility-level norms around dignity in care.</td>
+            <td>Camera monitoring is culturally normalised in care settings via silhouette/anonymised rendering rather than raw video.</td>
+          </tr>
+          <tr>
+            <td class="name">India</td>
+            <td>CDSCO device rules.</td>
+            <td>DPDP Act 2023.</td>
+            <td>Low regulatory friction relative to EU; the real barrier is cost and infrastructure.</td>
+          </tr>
+          <tr>
+            <td class="name">Cross-cutting</td>
+            <td colspan="3">
+              <strong>Discoverability.</strong> The question every hospital counsel asks is whether recordings
+              are obtainable in malpractice litigation. This — more than privacy law — is why de-identification
+              at capture and short retention windows are architectural requirements, not features.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warn">
+      <h4>Design rule that falls out of all of this</h4>
+      <p>
+        Systems that survive deployment share four properties: de-identify at the edge before anything is
+        stored; aggregate to team/room level rather than individual-performance level; delete on a short
+        fixed clock; and contractually bar use in HR or disciplinary proceedings. A product architecture
+        that cannot promise all four will stall in governance review regardless of accuracy.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="evidence">
+  <div class="wrap">
+    <p class="kicker">Evidence</p>
+    <h2>What the published numbers actually show</h2>
+    <p>
+      The evidence base is unusually good for layer 1 (because it grew out of academic surgical safety) and
+      thinner but commercially validated for layer 2.
+    </p>
+
+    <div class="stats">
+      <div class="stat"><span class="v">138</span><span class="l">median auditory distractions per case, first-year OR Black Box analysis, elective laparoscopic general surgery</span></div>
+      <div class="stat"><span class="v">20 / 8</span><span class="l">median errors / events identified per case in the same analysis</span></div>
+      <div class="stat"><span class="v">262</span><span class="l">median auditory distractions per case in a gynaecology (total laparoscopic hysterectomy) pilot</span></div>
+      <div class="stat"><span class="v">64%</span><span class="l">of cases with at least one cognitive distraction</span></div>
+      <div class="stat"><span class="v">&gt;50%</span><span class="l">fall-rate reduction reported by hospitals using virtual sitting (AvaSure, Artisight customer data)</span></div>
+      <div class="stat"><span class="v">48%</span><span class="l">reduction in night-time bedroom falls on dementia wards with Oxevision</span></div>
+      <div class="stat"><span class="v">26% / 22%</span><span class="l">reduction in bedroom assaults (PICU) and bedroom self-harm (acute wards) with Oxevision</span></div>
+      <div class="stat"><span class="v">40</span><span class="l">clinically relevant activity categories recognised from RGB video alone in Stanford's ICU Clinical Behavioral Atlas</span></div>
+    </div>
+
+    <p>
+      Two cautions on reading these. First, the OR Black Box counts are <em>descriptive</em> — they establish
+      that the environment is far noisier and more error-prone than self-report suggests, which is the real
+      contribution; they are not yet outcome trials. Second, the layer-2 percentages are predominantly
+      vendor-published customer results rather than randomised evidence. The strongest independent signal in
+      layer 2 is procurement behaviour (Epic Toolbox designation, a strategic acquisition, 1,000+ hospital
+      footprints), not effect sizes.
+    </p>
+  </div>
+</section>
+
+<section id="research">
+  <div class="wrap">
+    <p class="kicker">Research base</p>
+    <h2>The academic landscape — and why it is ahead</h2>
+    <p>
+      If you want to build in layer 1, this is the material to start from. The public datasets encode a
+      level of semantic understanding of the clinical team that no commercial product currently claims.
+    </p>
+
+    <div class="table-scroll">
+      <table>
+        <caption>Key datasets and benchmarks for whole-room clinical team understanding</caption>
+        <thead>
+          <tr>
+            <th scope="col">Dataset</th>
+            <th scope="col">Group</th>
+            <th scope="col">What it contains</th>
+            <th scope="col">Why it matters</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name">MVOR</td>
+            <td>CAMMA, Strasbourg</td>
+            <td>732 annotated timepoints from ceiling RGB-D cameras in a real OR; multi-view RGB, depth, 2D/3D keypoints per staff member.</td>
+            <td>The first real-OR multi-view human-pose benchmark. Small, but real clinical environment.</td>
+          </tr>
+          <tr>
+            <td class="name">4D-OR</td>
+            <td>TUM (Navab group)</td>
+            <td>10 simulated knee surgeries, 6 ceiling RGB-D Kinects, ~6,700 images/camera, ~11 min/case; human and object poses, <strong>semantic scene graphs</strong>, clinical roles, surgical phases.</td>
+            <td>Introduced scene graphs for OR modelling — "who is doing what to whom with what" as a structured output.</td>
+          </tr>
+          <tr>
+            <td class="name">MM-OR</td>
+            <td>TUM et al., 2025</td>
+            <td>Robotic knee replacements; multi-view RGB-D + high-res RGB + low-exposure tracking camera + audio + speech transcripts + robot system logs + screen recordings + IR tracking; panoptic segmentation, scene graphs, downstream task labels.</td>
+            <td>The most complete multimodal OR dataset in existence. Effectively an open-source OR black box.</td>
+          </tr>
+          <tr>
+            <td class="name">EgoExOR</td>
+            <td>2025</td>
+            <td>Combined egocentric (head-mounted) and exocentric (room) views for surgical activity understanding.</td>
+            <td>Addresses the occlusion problem that ceiling-only systems cannot solve.</td>
+          </tr>
+          <tr>
+            <td class="name">Trauma resuscitation corpus</td>
+            <td>Rutgers (Marsic) + Children's National</td>
+            <td>Video, speech and RFID-based concurrent activity recognition during trauma resuscitation; ~74% average precision on five concurrent activities using an extended I3D; multi-view real-time patient-arrival detection.</td>
+            <td>The ED analogue of the OR black box, and the strongest work on <em>concurrent</em> team activity — several people doing different things at once. Notably, privacy was preserved by pre-computing spatio-temporal features rather than storing video.</td>
+          </tr>
+          <tr>
+            <td class="name">ICU Clinical Behavioral Atlas</td>
+            <td>Stanford (Yeung, Milstein, Fei-Fei Li lineage)</td>
+            <td>40 clinically relevant activity categories and 55 object categories from RGB video alone; earlier work on patient mobilisation detection and hand-hygiene compliance.</td>
+            <td>The canonical "ambient intelligence" program — <em>Illuminating the dark spaces of healthcare with ambient intelligence</em> (Nature, 2020) is the field's founding reference.</td>
+          </tr>
+          <tr>
+            <td class="name">Emerging model work</td>
+            <td>Multiple, 2025–26</td>
+            <td>OR foundation models, multi-view video-pose pretraining, Spatial-ORMLLM (multimodal LLMs for OR spatial relations), TrackOR (robust person tracking for personalised ORs).</td>
+            <td>Direction of travel: from per-task classifiers to OR-specific foundation models with language interfaces.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details>
+      <summary>Reading list — start here</summary>
+      <ul>
+        <li><strong>Nature (2020)</strong> — <em>Illuminating the dark spaces of healthcare with ambient intelligence</em>. The framing paper for the whole field.</li>
+        <li><strong>Annals of Surgery (2018)</strong> — <em>First-year Analysis of the Operating Room Black Box Study</em>. The distraction/error counts everyone cites.</li>
+        <li><strong>4D-OR / MM-OR papers</strong> — the technical state of the art for whole-team modelling.</li>
+        <li><strong>Video-based Concurrent Activity Recognition for Trauma Resuscitation</strong> — the best treatment of simultaneous multi-actor activity.</li>
+        <li><strong>NEJM AI (2025)</strong> — <em>Developing ICU Clinical Behavioral Atlas Using Ambient Intelligence and Computer Vision</em>.</li>
+        <li><strong>Feasibility study of OR Black Box implementation</strong> (PMC) — the consent, security and de-identification concerns, quantified by staff group.</li>
+      </ul>
+    </details>
+  </div>
+</section>
+
+<section id="whitespace">
+  <div class="wrap">
+    <p class="kicker">Analysis</p>
+    <h2>What is unsolved, and where the openings are</h2>
+
+    <h3>Technically unsolved</h3>
+    <ul>
+      <li><strong>Concurrent, multi-actor activity.</strong> Nearly all deployed systems classify one dominant activity at a time. Real resuscitations and real ORs have five people doing five things. The trauma-resuscitation literature is the only sustained attack on this, and it tops out around 74% AP.</li>
+      <li><strong>Occlusion and role identity.</strong> Ceiling views lose hands at the critical moment; identifying <em>who</em> did something without face recognition (which privacy law disfavours) is genuinely hard. EgoExOR's ego+exo fusion is the current best answer.</li>
+      <li><strong>Rare events.</strong> The events worth catching — retained items, sterile-field breaks, near-miss medication errors — occur at rates like 1.3 per 10,000. Supervised learning has almost no positives to learn from.</li>
+      <li><strong>Generalisation across rooms.</strong> Models trained in one OR layout with one camera rig degrade elsewhere; this, not accuracy in the lab, is what limits commercial rollout speed.</li>
+      <li><strong>From detection to actionable feedback.</strong> Counting 138 distractions per case is a finding; changing a team's behaviour is a different problem, and almost nobody has published on the intervention side.</li>
+    </ul>
+
+    <h3>Commercially open</h3>
+    <ul>
+      <li><strong>The ED and the ICU, not the OR.</strong> Layer 1 is crowded in surgery and essentially empty in emergency and critical care, where teamwork failures are at least as consequential and the academic groundwork already exists.</li>
+      <li><strong>Privacy-preserving-by-construction sensing.</strong> Teton.ai's anonymised digital twin and the Rutgers "store features, not video" approach point at an architecture that dissolves the consent objection instead of negotiating it. In the EU this is close to a requirement.</li>
+      <li><strong>Non-affective team analytics.</strong> With emotion inference banned in EU workplaces, the defensible product is objective process measurement — timings, sequences, protocol adherence, communication events — not inferred internal state.</li>
+      <li><strong>Low-cost geographies.</strong> India's success with sub-mattress sensing shows the demand exists where camera economics don't work yet.</li>
+      <li><strong>The audio flank.</strong> Ambient documentation vendors already have microphones in the room and enormous budgets. A camera product that composes with them beats one that competes with them.</li>
+    </ul>
+
+    <div class="callout">
+      <h4>If I had to pick the single most defensible entry</h4>
+      <p>
+        Resuscitation and critical-care team performance, built privacy-first (edge feature extraction, no
+        raw retention), sold initially as training and debrief rather than audit, composing with an existing
+        ambient-audio deployment. It inherits the strongest academic base, faces the weakest incumbent, and
+        sidesteps the consent politics that constrain the surgical incumbent.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="business">
+  <div class="wrap">
+    <p class="kicker">Commercial dynamics</p>
+    <h2>How these companies actually make money</h2>
+    <ul>
+      <li><strong>Per-room or per-bed SaaS</strong> is the dominant model in layer 2 — priced against the sitter FTE or nurse-hours it displaces, which makes ROI arithmetic easy and the sale fast.</li>
+      <li><strong>Per-OR subscription plus services</strong> in layer 1, sold to quality/safety budgets that are far smaller than nursing budgets. This is why layer 1 companies drift toward efficiency claims: the efficiency budget is bigger.</li>
+      <li><strong>Data monetisation to industry</strong> — device-effectiveness evidence and risk analytics sold to manufacturers and insurers (Caresyntax explicitly; SST's device-evaluation positioning implicitly). Highest margin, highest governance risk.</li>
+      <li><strong>Hardware-subsidised platform</strong>, the medtech incumbent play: Stryker, Medtronic and Karl Storz can give away room infrastructure to defend the capital equipment and consumables around it. This is the main structural threat to independent vendors.</li>
+      <li><strong>Consolidation is underway.</strong> care.ai → Stryker (2024), Nurse Disrupted → AvaSure (2025), SwipeSense → SC Johnson. Health systems are reported to prefer unified platforms over best-of-breed points solutions, which compresses the window for single-feature startups.</li>
+    </ul>
+    <div class="stats">
+      <div class="stat"><span class="v">$7.0B</span><span class="l">computer vision in healthcare, 2026 estimate (analyst forecasts vary widely; treat as directional)</span></div>
+      <div class="stat"><span class="v">$115M</span><span class="l">total raised by Apella after its Jan 2026 Series B</span></div>
+      <div class="stat"><span class="v">$207M+</span><span class="l">total raised by Caresyntax since 2013</span></div>
+      <div class="stat"><span class="v">62.6%</span><span class="l">of Epic-using US hospitals had adopted an ambient AI tool by Jun 2025 — the adoption curve camera vendors are chasing</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="caveats">
+  <div class="wrap">
+    <p class="kicker">Confidence</p>
+    <h2>What to verify before acting on this</h2>
+    <ul>
+      <li><strong>Theator's FDA status is unconfirmed.</strong> A secondary industry source states clearance for laparoscopic cholecystectomy (2023) with expanded indications; I could not corroborate it in FDA databases or on Theator's own pages. Check the FDA 510(k)/De Novo databases directly.</li>
+      <li><strong>Site counts and outcome percentages are company-published</strong> unless attributed to a journal. AvaSure's 1,100+ hospitals, Artisight's 400+, SST's 24+ facilities, and all the fall-reduction figures fall in this class.</li>
+      <li><strong>Market-size figures are analyst projections</strong> with enormous spread between houses. They are useful for direction only; do not build a model on them.</li>
+      <li><strong>Chinese and Japanese deployment detail is thin in English sources.</strong> The picture here is assembled from vendor material and English-language reporting; primary-language research would likely change the detail, not the direction.</li>
+      <li><strong>Regulatory positions move.</strong> The EU AI Act's Annex III obligations phase in on 2 Aug 2026 — effectively now — so any EU go-to-market assessment should be re-checked against the current guidance rather than this snapshot.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="sources">
+  <div class="wrap">
+    <p class="kicker">References</p>
+    <h2>Sources</h2>
+    <ul class="sources">
+      <li><a href="https://www.surgicalsafety.com/platform/black-box-platform">Surgical Safety Technologies — OR Black Box platform</a></li>
+      <li><a href="https://www.surgicalsafety.com/company/news/surgical-safety-technologies-secures-15-million-series-a-funding">SST — US$15M Series A</a></li>
+      <li><a href="https://pubmed.ncbi.nlm.nih.gov/29916872/">First-year Analysis of the Operating Room Black Box Study (Annals of Surgery)</a></li>
+      <li><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8341265/">OR Black Box in the gynaecology OR — pilot study</a></li>
+      <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9925891/">Implementation of the OR Black Box: a feasibility study (consent and staff concerns)</a></li>
+      <li><a href="https://www.technologyreview.com/2024/06/07/1093338/surgical-safety-technologies-ai-black-box-surgery-operating-room/">MIT Technology Review — the AI black box for surgery</a></li>
+      <li><a href="https://www.bostonglobe.com/2024/01/13/metro/ai-surgery-blackbox-brigham-boston/">Boston Globe — Mass General Brigham black box, staff objections</a></li>
+      <li><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12870878/">Nationwide survey of stakeholder perspectives on OR audiovisual recording (France)</a></li>
+      <li><a href="https://apella.io/blog/apella-raises-80-million-in-series-b-to-transform-the-hospital-with-ambient-ai-and-computer-vision">Apella — US$80M Series B</a></li>
+      <li><a href="https://apella.io/blog/exploring-the-or-status-camera-landscape-stryker-karl-storz-sst-or-black-box-artisight-proximie-and-apella">Apella — OR status camera landscape overview</a></li>
+      <li><a href="https://www.caresyntax.com/news/caresyntax-raises-180-million-funding-to-accelerate-growth-and-adoption-of-precision-surgery-2">Caresyntax — funding and platform scale</a></li>
+      <li><a href="https://theator.io/">Theator — surgical intelligence platform</a></li>
+      <li><a href="https://www.medtronic.com/en-us/healthcare-professionals/specialties/touch-surgery/ecosystem.html">Medtronic — Touch Surgery Ecosystem</a></li>
+      <li><a href="https://www.massdevice.com/medtronic-launches-ai-platform-robotic-surgery/">Medtronic Touch Surgery Aide — AI computing platform for the OR</a></li>
+      <li><a href="https://artisight.com/">Artisight — smart hospital platform</a></li>
+      <li><a href="https://www.prnewswire.com/news-releases/artisight-is-the-first-smart-hospital-platform-to-document-operating-room-procedures-in-the-ehr-with-computer-vision-302540429.html">Artisight — CV documentation of OR procedures into the EHR</a></li>
+      <li><a href="https://www.stryker.com/us/en/acute-care/c/care-ai-human-centered-care.html">Stryker — care.ai / SmartHospital</a></li>
+      <li><a href="https://avasure.com/telesitter/">AvaSure — TeleSitter</a></li>
+      <li><a href="https://www.morningstar.com/news/business-wire/20251110446862/avasure-achieves-epic-toolbox-designation-for-inpatient-virtual-care">AvaSure — Epic Toolbox designation</a></li>
+      <li><a href="https://lookdeep.health/lookdeep-health-announces-advances-for-vision-ai-for-patient-care-sets-transparency-standard-for-smart-hospitals/">LookDeep Health — vision AI transparency benchmarks</a></li>
+      <li><a href="https://arxiv.org/pdf/2412.13152">Continuous Patient Monitoring with AI: Real-Time Analysis of Video in Hospital Care Settings</a></li>
+      <li><a href="https://www.biospace.com/fda-grants-oxehealth-vital-signs-de-novo-clearance">FDA grants Oxehealth Vital Signs De Novo clearance</a></li>
+      <li><a href="https://emhicglobal.com/case-studies/oxehealth-a-global-leader-in-vision-based-patient-monitoring-and-management">Oxehealth — NHS deployment and outcome data</a></li>
+      <li><a href="https://www.thecanary.co/uk/analysis/2025/10/14/oxevision-nhs/">Reporting on Oxevision consent concerns in NHS mental health wards</a></li>
+      <li><a href="https://www.rethink.org/news-and-stories/media-centre/2023/11/our-position-on-oxevision-the-new-monitoring-system-in-mental-health-units/">Rethink Mental Illness — position on Oxevision</a></li>
+      <li><a href="https://arcticstartup.com/teton-ai-raises-20-million-series-a/">Teton.ai — US$20M Series A</a></li>
+      <li><a href="https://www.mobihealthnews.com/news/teton-unveils-3d-hospital-digital-twin-using-denmarks-supercomputer">Teton.ai — 3D hospital digital twin</a></li>
+      <li><a href="https://www.nature.com/articles/s41586-020-2669-y">Illuminating the dark spaces of healthcare with ambient intelligence (Nature, 2020)</a></li>
+      <li><a href="https://ai.nejm.org/doi/10.1056/AIoa2400590">ICU Clinical Behavioral Atlas (NEJM AI)</a></li>
+      <li><a href="https://www.nature.com/articles/s41746-019-0087-z">Deep-learning detection of patient mobilization activities in the ICU (npj Digital Medicine)</a></li>
+      <li><a href="https://pubmed.ncbi.nlm.nih.gov/32712656/">Automatic detection of hand hygiene using computer vision technology</a></li>
+      <li><a href="https://arxiv.org/pdf/2003.09087">Fully automated hand hygiene monitoring in the OR using a 3D CNN</a></li>
+      <li><a href="https://arxiv.org/html/2503.02579v1">MM-OR: a large multimodal operating room dataset</a></li>
+      <li><a href="https://arxiv.org/html/2505.24287">EgoExOR: an ego-exo-centric operating room dataset</a></li>
+      <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11098880/">Holistic OR domain modeling: a semantic scene graph approach (4D-OR lineage)</a></li>
+      <li><a href="https://arxiv.org/pdf/2508.07968">TrackOR: robust tracking for personalised intelligent operating rooms</a></li>
+      <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7968732/">Video-based concurrent activity recognition for trauma resuscitation</a></li>
+      <li><a href="https://www.sciencedirect.com/science/article/pii/S107731422600144X">Multi-view real-time detection of patient arrival in trauma resuscitation</a></li>
+      <li><a href="https://link.springer.com/article/10.1186/s13037-024-00406-y">AI model for automated surgical instrument detection and counting</a></li>
+      <li><a href="https://fpf.org/blog/red-lines-under-eu-ai-act-unpacking-the-prohibition-of-emotion-recognition-in-the-workplace-and-education-institutions/">Future of Privacy Forum — AI Act prohibition on workplace emotion recognition</a></li>
+      <li><a href="https://iapp.org/news/a/biometrics-in-the-eu-navigating-the-gdpr-ai-act">IAPP — biometrics under GDPR and the AI Act</a></li>
+      <li><a href="https://www.morganlewis.com/blogs/healthlawscan/2023/12/illinois-supreme-court-holds-healthcare-employee-fingerprint-data-exempt-from-bipa">Illinois Supreme Court — BIPA healthcare exclusion (Mosby v. Ingalls)</a></li>
+      <li><a href="https://www.nature.com/articles/s41746-024-01254-x">Regulatory responses and approval status of AI medical devices, focus on China (npj Digital Medicine)</a></li>
+      <li><a href="https://medinform.jmir.org/2026/1/e85538/PDF">Approval of AI-based medical devices in China, 2020–2025 (JMIR Medical Informatics)</a></li>
+      <li><a href="https://clinicaltrials.gov/study/NCT07307521">AI-assisted video monitoring to predict accidental events in ICU patients (China, trial registration)</a></li>
+      <li><a href="https://www.hikvision.com/en/solutions/solutions-by-industry/hospitals/streamlined-facility-operations/">Hikvision — hospital facility operations solutions</a></li>
+      <li><a href="https://www.konicaminolta.com/about/csr/social-innovation/case/care-support.html">Konica Minolta — HitomeQ Care Support</a></li>
+      <li><a href="https://research.konicaminolta.com/en/technology/tech_details/qol/">Konica Minolta — behaviour detection technology</a></li>
+      <li><a href="https://en.sedaily.com/culture/2026/04/27/samsung-medical-center-opens-ai-powered-smart-hospital-rooms">Samsung Medical Center — AI smart hospital rooms</a></li>
+      <li><a href="https://blogs.nvidia.com/blog/taiwan-medical-centers-system-builder-partners/">Taiwan medical centres — Foxconn/NVIDIA digital twins and nursing robots</a></li>
+      <li><a href="https://www.hospitalmanagementasia.com/tech-innovation/2025-ai-in-action-five-examples-of-how-asias-hospitals-are-leveraging-ai-for-better-care/">Hospital Management Asia — AI in Asia's hospitals</a></li>
+      <li><a href="https://frontiertech.niti.gov.in/story/a-slim-ai-mattress-sheet-that-detects-silent-health-risks-before-they-strike/">NITI Aayog — Dozee implementation in Indian hospitals</a></li>
+      <li><a href="https://www.healthcareitnews.com/news/asia/connected-beds-can-save-indias-public-hospitals-over-250m-year-study">Connected beds in India's public hospitals — nursing time savings</a></li>
+      <li><a href="https://klasresearch.com/report/abridge-ambient-ai-for-nursing-2026-reducing-nursing-workflow-burden-through-ambient-ai-documentation/3998">KLAS — ambient AI for nursing</a></li>
+      <li><a href="https://www.businesswire.com/news/home/20260623410152/en/Harnessing-AI-powered-Weapons-Detection-Systems-to-Better-Protect-the-Healthcare-Workforce">AI weapons detection in healthcare — workforce protection</a></li>
+      <li><a href="https://www.swipesense.com/electronic-hand-hygiene-monitoring/">SwipeSense — electronic hand hygiene monitoring</a></li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>
+      Compiled from open-source desk research in August 2026. Company figures are as published by the
+      companies unless attributed to a journal or regulator. Nothing here is legal or regulatory advice —
+      the device-classification and privacy-law positions are summaries of public guidance and should be
+      confirmed with counsel for any specific product.
+    </p>
+  </div>
+</footer>

@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ollama Model Comparison 2026</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d2e;
+    --surface2: #242840;
+    --border: #2e3250;
+    --text: #e2e8f0;
+    --text-muted: #8892b0;
+    --accent: #7c3aed;
+    --accent2: #06b6d4;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --orange: #f97316;
+    --pink: #ec4899;
+    --blue: #3b82f6;
+    --indigo: #6366f1;
+  }
+  [data-theme="light"] {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface2: #f1f5f9;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, #1e0a3c 0%, #0f1117 50%, #0a2040 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 1.5rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    top: -20%;
+    right: 5%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-inner { max-width: 1400px; margin: 0 auto; position: relative; z-index: 1; }
+  .header-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  h1 {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, #a78bfa, #67e8f9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+  }
+  .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem; }
+  .badge {
+    display: inline-block; background: rgba(124,58,237,0.2); color: #a78bfa;
+    border: 1px solid rgba(124,58,237,0.4); border-radius: 20px;
+    padding: 0.2rem 0.7rem; font-size: 0.75rem; font-weight: 600; margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+
+  /* Theme toggle */
+  .theme-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); border-radius: 8px; padding: 0.4rem 0.8rem;
+    cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;
+    white-space: nowrap;
+  }
+  .theme-btn:hover { border-color: var(--accent); }
+
+  /* Stats bar */
+  .stats { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px solid var(--border); }
+  .stat { display: flex; flex-direction: column; }
+  .stat-val { font-size: 1.5rem; font-weight: 700; color: var(--accent2); }
+  .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* Controls */
+  .controls {
+    max-width: 1400px; margin: 1.5rem auto; padding: 0 1.5rem;
+    display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;
+  }
+  .search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 320px; }
+  .search-wrap input {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); border-radius: 8px; padding: 0.55rem 0.75rem 0.55rem 2.2rem;
+    font-size: 0.875rem; outline: none;
+  }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-icon { position: absolute; left: 0.6rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.9rem; pointer-events: none; }
+  select {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); border-radius: 8px; padding: 0.55rem 0.75rem;
+    font-size: 0.875rem; outline: none; cursor: pointer;
+  }
+  select:focus { border-color: var(--accent); }
+  .filter-group { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .chip {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-muted); border-radius: 20px;
+    padding: 0.3rem 0.75rem; font-size: 0.78rem; cursor: pointer;
+    transition: all 0.15s; font-weight: 500; white-space: nowrap;
+  }
+  .chip:hover, .chip.active { border-color: var(--accent); color: var(--accent2); background: rgba(124,58,237,0.1); }
+  .controls-divider { width: 1px; height: 28px; background: var(--border); }
+  .view-toggle { display: flex; gap: 0.3rem; }
+  .view-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-muted); border-radius: 6px; padding: 0.4rem 0.6rem;
+    cursor: pointer; font-size: 0.85rem;
+  }
+  .view-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+  /* Results count */
+  .result-count {
+    max-width: 1400px; margin: 0 auto; padding: 0 1.5rem 0.75rem;
+    font-size: 0.82rem; color: var(--text-muted);
+  }
+
+  /* Table view */
+  .table-wrap { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem 3rem; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  thead th {
+    background: var(--surface2); padding: 0.75rem 1rem;
+    text-align: left; font-weight: 600; font-size: 0.78rem;
+    text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted);
+    border-bottom: 1px solid var(--border); cursor: pointer; user-select: none;
+    white-space: nowrap; position: sticky; top: 0; z-index: 2;
+  }
+  thead th:hover { color: var(--text); }
+  thead th .sort-icon { margin-left: 4px; opacity: 0.4; font-size: 0.7rem; }
+  thead th.sorted .sort-icon { opacity: 1; color: var(--accent2); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:hover { background: var(--surface2); }
+  td { padding: 0.65rem 1rem; vertical-align: middle; }
+  td:first-child { font-weight: 600; }
+
+  /* Family badge */
+  .family-tag {
+    display: inline-block; border-radius: 4px; padding: 0.15rem 0.5rem;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.03em;
+  }
+  .family-llama     { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+  .family-mistral   { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+  .family-gemma     { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+  .family-phi       { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+  .family-qwen      { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+  .family-deepseek  { background: rgba(6,182,212,0.12); color: #22d3ee; border: 1px solid rgba(6,182,212,0.3); }
+  .family-codellama { background: rgba(168,85,247,0.12); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); }
+  .family-other     { background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.25); }
+
+  /* Size bar */
+  .size-bar-wrap { display: flex; align-items: center; gap: 0.5rem; }
+  .size-bar { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); flex-shrink: 0; }
+  .size-text { font-size: 0.8rem; font-weight: 600; color: var(--text); white-space: nowrap; }
+
+  /* Context pill */
+  .ctx-pill {
+    display: inline-block; border-radius: 4px; padding: 0.1rem 0.45rem;
+    font-size: 0.72rem; font-weight: 600;
+  }
+  .ctx-small  { background: rgba(148,163,184,0.1); color: #94a3b8; }
+  .ctx-medium { background: rgba(16,185,129,0.1);  color: #34d399; }
+  .ctx-large  { background: rgba(124,58,237,0.15); color: #a78bfa; }
+  .ctx-huge   { background: rgba(6,182,212,0.15);  color: #22d3ee; }
+
+  /* Use-case tags */
+  .use-tags { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+  .use-tag {
+    border-radius: 3px; padding: 0.1rem 0.4rem;
+    font-size: 0.7rem; font-weight: 500;
+  }
+  .use-general  { background: rgba(99,102,241,0.1); color: #818cf8; }
+  .use-coding   { background: rgba(16,185,129,0.1); color: #34d399; }
+  .use-reasoning{ background: rgba(6,182,212,0.1);  color: #22d3ee; }
+  .use-chat     { background: rgba(245,158,11,0.1); color: #fbbf24; }
+  .use-vision   { background: rgba(239,68,68,0.1);  color: #f87171; }
+  .use-embed    { background: rgba(168,85,247,0.1); color: #c084fc; }
+  .use-edge     { background: rgba(148,163,184,0.1);color: #94a3b8; }
+
+  /* VRAM indicator */
+  .vram { font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
+  .vram-low  { color: #34d399; }
+  .vram-mid  { color: #fbbf24; }
+  .vram-high { color: #fb923c; }
+  .vram-huge { color: #f87171; }
+
+  /* MoE tag */
+  .moe-tag {
+    display: inline-block; background: rgba(6,182,212,0.1); color: #22d3ee;
+    border: 1px solid rgba(6,182,212,0.3); border-radius: 3px;
+    padding: 0.05rem 0.35rem; font-size: 0.65rem; font-weight: 700;
+    margin-left: 4px; vertical-align: middle; letter-spacing: 0.05em;
+  }
+
+  /* Card view */
+  .cards-wrap { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem 3rem; display: none; }
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.25rem; transition: border-color 0.2s, transform 0.15s;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.75rem; }
+  .card-name { font-weight: 700; font-size: 1rem; }
+  .card-params { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.1rem; }
+  .card-row { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+  .card-row:last-of-type { border-bottom: none; }
+  .card-key { color: var(--text-muted); }
+  .card-val { font-weight: 600; }
+  .card-uses { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 0.75rem; }
+  .card-desc { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.6rem; line-height: 1.4; }
+
+  /* No results */
+  .no-results { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
+  .no-results .icon { font-size: 3rem; margin-bottom: 1rem; }
+
+  /* Footer */
+  footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border); }
+  footer a { color: var(--accent2); text-decoration: none; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-top">
+      <div>
+        <h1>Ollama Model Comparison <span class="badge">2026</span></h1>
+        <div class="subtitle">All major models you can run locally with <code>ollama pull &lt;model&gt;</code> — sizes, context, benchmarks, and use cases</div>
+      </div>
+      <button class="theme-btn" onclick="toggleTheme()">🌙 Toggle Theme</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="stat-val" id="totalCount">0</span><span class="stat-label">Models Listed</span></div>
+      <div class="stat"><span class="stat-val">8</span><span class="stat-label">Families</span></div>
+      <div class="stat"><span class="stat-val">135M–671B</span><span class="stat-label">Parameter Range</span></div>
+      <div class="stat"><span class="stat-val">2K–10M</span><span class="stat-label">Context Range</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search" placeholder="Search models..." oninput="applyFilters()">
+  </div>
+
+  <select id="familyFilter" onchange="applyFilters()">
+    <option value="">All Families</option>
+    <option value="Llama">Llama (Meta)</option>
+    <option value="Mistral">Mistral AI</option>
+    <option value="Gemma">Gemma (Google)</option>
+    <option value="Phi">Phi (Microsoft)</option>
+    <option value="Qwen">Qwen (Alibaba)</option>
+    <option value="DeepSeek">DeepSeek</option>
+    <option value="CodeLlama">CodeLlama</option>
+    <option value="Other">Other</option>
+  </select>
+
+  <select id="useFilter" onchange="applyFilters()">
+    <option value="">All Use Cases</option>
+    <option value="general">General Purpose</option>
+    <option value="coding">Coding</option>
+    <option value="reasoning">Reasoning</option>
+    <option value="chat">Chat</option>
+    <option value="vision">Vision</option>
+    <option value="embed">Embeddings</option>
+    <option value="edge">Edge / Tiny</option>
+  </select>
+
+  <select id="vramFilter" onchange="applyFilters()">
+    <option value="">Any VRAM</option>
+    <option value="4">≤ 4 GB</option>
+    <option value="8">≤ 8 GB</option>
+    <option value="16">≤ 16 GB</option>
+    <option value="24">≤ 24 GB</option>
+  </select>
+
+  <div class="controls-divider"></div>
+
+  <div class="filter-group" id="ctxFilter">
+    <span class="chip active" data-ctx="" onclick="setCtxFilter(this, '')">Any Context</span>
+    <span class="chip" data-ctx="128k" onclick="setCtxFilter(this, '128k')">≥ 128K</span>
+    <span class="chip" data-ctx="256k" onclick="setCtxFilter(this, '256k')">≥ 256K</span>
+  </div>
+
+  <div class="controls-divider"></div>
+  <div class="view-toggle">
+    <button class="view-btn active" id="tableViewBtn" onclick="setView('table')" title="Table view">☰</button>
+    <button class="view-btn" id="cardViewBtn" onclick="setView('cards')" title="Card view">⊞</button>
+  </div>
+</div>
+
+<div class="result-count" id="resultCount"></div>
+
+<div class="table-wrap" id="tableView">
+  <table id="modelsTable">
+    <thead>
+      <tr>
+        <th onclick="sortBy('name')">Model <span class="sort-icon">↕</span></th>
+        <th onclick="sortBy('family')">Family <span class="sort-icon">↕</span></th>
+        <th onclick="sortBy('params')">Params <span class="sort-icon">↕</span></th>
+        <th onclick="sortBy('size')">Disk Size <span class="sort-icon">↕</span></th>
+        <th onclick="sortBy('vram')">VRAM Needed <span class="sort-icon">↕</span></th>
+        <th onclick="sortBy('context')">Context <span class="sort-icon">↕</span></th>
+        <th onclick="sortBy('released')">Released <span class="sort-icon">↕</span></th>
+        <th>Best For</th>
+        <th onclick="sortBy('notes')">Notes <span class="sort-icon">↕</span></th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="no-results" id="noResults" style="display:none">
+    <div class="icon">🤖</div>
+    <div>No models match your filters.</div>
+  </div>
+</div>
+
+<div class="cards-wrap" id="cardView">
+  <div class="cards-grid" id="cardsGrid"></div>
+  <div class="no-results" id="noResultsCards" style="display:none">
+    <div class="icon">🤖</div>
+    <div>No models match your filters.</div>
+  </div>
+</div>
+
+<footer>
+  Data accurate as of August 2026 ·
+  <a href="https://ollama.com/library" target="_blank">ollama.com/library</a> ·
+  VRAM estimates based on Q4_K_M quantization at 2K context unless noted
+</footer>
+
+<script>
+const MODELS = [
+  // ── Llama (Meta) ──────────────────────────────────────────────────
+  { name:'llama3.2:1b',      family:'Llama',     paramB:1,     sizeGB:0.8,  vramGB:2,   contextK:128,  released:'2024-09', uses:['edge','chat'],          moe:false, desc:'Smallest Llama 3.2. Runs on phones and Raspberry Pi.' },
+  { name:'llama3.2:3b',      family:'Llama',     paramB:3,     sizeGB:1.9,  vramGB:4,   contextK:128,  released:'2024-09', uses:['edge','chat'],          moe:false, desc:'Fast, lightweight model for constrained environments.' },
+  { name:'llama3.1:8b',      family:'Llama',     paramB:8,     sizeGB:4.7,  vramGB:6,   contextK:128,  released:'2024-07', uses:['general','chat'],       moe:false, desc:'Workhorse model for most everyday tasks. Great quality/speed.' },
+  { name:'llama3.1:70b',     family:'Llama',     paramB:70,    sizeGB:40,   vramGB:48,  contextK:128,  released:'2024-07', uses:['general','reasoning'],  moe:false, desc:'Near-GPT-4 quality. Needs a large GPU or Mac with 64GB+.' },
+  { name:'llama3.1:405b',    family:'Llama',     paramB:405,   sizeGB:243,  vramGB:250, contextK:128,  released:'2024-07', uses:['general','reasoning'],  moe:false, desc:'Meta\'s flagship. Frontier-level, requires server GPU farm.' },
+  { name:'llama3.3:70b',     family:'Llama',     paramB:70,    sizeGB:43,   vramGB:48,  contextK:128,  released:'2024-12', uses:['general','reasoning'],  moe:false, desc:'Matches Llama 3.1 405B quality in a 70B package.' },
+  { name:'llama4:scout',     family:'Llama',     paramB:109,   sizeGB:68,   vramGB:48,  contextK:10240,released:'2025-04', uses:['general','vision'],     moe:true,  activeB:17, desc:'Llama 4 MoE with a record-breaking 10M context window. Multimodal.' },
+
+  // ── Mistral ────────────────────────────────────────────────────────
+  { name:'mistral:7b',           family:'Mistral', paramB:7,   sizeGB:4.1,  vramGB:6,   contextK:32,   released:'2023-09', uses:['general','chat'],       moe:false, desc:'The original Mistral 7B. Surprisingly strong at its size.' },
+  { name:'mistral-nemo:12b',     family:'Mistral', paramB:12,  sizeGB:7.1,  vramGB:10,  contextK:128,  released:'2024-07', uses:['general','coding'],     moe:false, desc:'Joint Mistral/NVIDIA model. 128K context, multilingual.' },
+  { name:'mistral-small3.1:24b', family:'Mistral', paramB:24,  sizeGB:14,   vramGB:16,  contextK:128,  released:'2025-03', uses:['general','vision'],     moe:false, desc:'Near-70B quality at 14GB. Vision capable, 80+ languages.' },
+  { name:'mistral-large:123b',   family:'Mistral', paramB:123, sizeGB:74,   vramGB:80,  contextK:128,  released:'2024-11', uses:['general','reasoning'],  moe:false, desc:'Mistral\'s top model. Enterprise-grade, 80+ languages.' },
+  { name:'devstral:24b',         family:'Mistral', paramB:24,  sizeGB:14,   vramGB:16,  contextK:128,  released:'2025-05', uses:['coding'],               moe:false, desc:'46.8% SWE-Bench. Best coding model under 16GB VRAM.' },
+
+  // ── Gemma (Google) ────────────────────────────────────────────────
+  { name:'gemma2:2b',   family:'Gemma', paramB:2,  sizeGB:1.6,  vramGB:3,   contextK:8,    released:'2024-06', uses:['edge','chat'],    moe:false, desc:'Google\'s tiny but capable model. Runs on 4GB RAM.' },
+  { name:'gemma2:9b',   family:'Gemma', paramB:9,  sizeGB:5.4,  vramGB:8,   contextK:8,    released:'2024-06', uses:['general','chat'], moe:false, desc:'Balanced quality and speed. Good for everyday use.' },
+  { name:'gemma2:27b',  family:'Gemma', paramB:27, sizeGB:16,   vramGB:20,  contextK:8,    released:'2024-06', uses:['general'],        moe:false, desc:'Gemma 2\'s largest model. Strong reasoning capabilities.' },
+  { name:'gemma3:4b',   family:'Gemma', paramB:4,  sizeGB:2.5,  vramGB:4,   contextK:128,  released:'2025-03', uses:['general','vision'],moe:false, desc:'Gemma 3 with 128K context and vision. Impressive for size.' },
+  { name:'gemma3:12b',  family:'Gemma', paramB:12, sizeGB:7.5,  vramGB:10,  contextK:128,  released:'2025-03', uses:['general','vision'],moe:false, desc:'Strong multilingual and coding abilities. Vision capable.' },
+  { name:'gemma3:27b',  family:'Gemma', paramB:27, sizeGB:16,   vramGB:20,  contextK:128,  released:'2025-03', uses:['general','vision'],moe:false, desc:'Top of Gemma 3 line. Near-frontier quality, 128K context.' },
+  { name:'gemma4:27b',  family:'Gemma', paramB:27, sizeGB:14,   vramGB:16,  contextK:256,  released:'2025-05', uses:['general','vision'],moe:false, desc:'Frontier-level at 27B. 256K context, 85 tok/s on consumer GPU.' },
+
+  // ── Phi (Microsoft) ───────────────────────────────────────────────
+  { name:'phi3:3.8b',      family:'Phi', paramB:3.8, sizeGB:2.2,  vramGB:4,  contextK:128, released:'2024-04', uses:['general','edge'],   moe:false, desc:'Microsoft\'s first Phi-3. Impressive quality at 3.8B params.' },
+  { name:'phi3.5:3.8b',    family:'Phi', paramB:3.8, sizeGB:2.2,  vramGB:4,  contextK:128, released:'2024-08', uses:['general'],          moe:false, desc:'Improved Phi-3 with better STEM and multilingual perf.' },
+  { name:'phi4:14b',       family:'Phi', paramB:14,  sizeGB:8.5,  vramGB:10, contextK:16,  released:'2024-12', uses:['reasoning','general'],moe:false,desc:'Beats many larger models on math/reasoning benchmarks.' },
+  { name:'phi4-mini:3.8b', family:'Phi', paramB:3.8, sizeGB:2.3,  vramGB:4,  contextK:128, released:'2025-02', uses:['edge','reasoning'], moe:false, desc:'Phi-4 quality packed into a tiny 3.8B model.' },
+
+  // ── Qwen (Alibaba) ────────────────────────────────────────────────
+  { name:'qwen2.5:0.5b',       family:'Qwen', paramB:0.5, sizeGB:0.4,  vramGB:1,   contextK:32,  released:'2024-09', uses:['edge'],          moe:false, desc:'Ultra-tiny model for very constrained devices.' },
+  { name:'qwen2.5:1.5b',       family:'Qwen', paramB:1.5, sizeGB:1.0,  vramGB:2,   contextK:32,  released:'2024-09', uses:['edge'],          moe:false, desc:'Lightweight general assistant.' },
+  { name:'qwen2.5:3b',         family:'Qwen', paramB:3,   sizeGB:1.9,  vramGB:4,   contextK:32,  released:'2024-09', uses:['edge','chat'],   moe:false, desc:'Compact model that punches above its weight.' },
+  { name:'qwen2.5:7b',         family:'Qwen', paramB:7,   sizeGB:4.7,  vramGB:6,   contextK:128, released:'2024-09', uses:['general','chat'],moe:false, desc:'Excellent general model with 128K context.' },
+  { name:'qwen2.5:14b',        family:'Qwen', paramB:14,  sizeGB:9.0,  vramGB:12,  contextK:128, released:'2024-09', uses:['general'],       moe:false, desc:'Strong instruction following and reasoning.' },
+  { name:'qwen2.5:32b',        family:'Qwen', paramB:32,  sizeGB:19,   vramGB:24,  contextK:128, released:'2024-09', uses:['general'],       moe:false, desc:'Near-70B quality at half the size.' },
+  { name:'qwen2.5:72b',        family:'Qwen', paramB:72,  sizeGB:43,   vramGB:48,  contextK:128, released:'2024-09', uses:['general'],       moe:false, desc:'Qwen 2.5\'s flagship. Competitive with GPT-4o.' },
+  { name:'qwen2.5-coder:7b',   family:'Qwen', paramB:7,   sizeGB:4.7,  vramGB:6,   contextK:128, released:'2024-10', uses:['coding'],        moe:false, desc:'Best coding model at 8GB VRAM. Very strong for its size.' },
+  { name:'qwen2.5-coder:32b',  family:'Qwen', paramB:32,  sizeGB:19,   vramGB:24,  contextK:128, released:'2024-11', uses:['coding'],        moe:false, desc:'World-class code completion and generation at 32B.' },
+  { name:'qwen3:8b',           family:'Qwen', paramB:8,   sizeGB:5.2,  vramGB:6,   contextK:128, released:'2025-05', uses:['general','reasoning'],moe:false,desc:'Qwen 3 with optional thinking mode (chain-of-thought).' },
+  { name:'qwen3:14b',          family:'Qwen', paramB:14,  sizeGB:9.3,  vramGB:12,  contextK:128, released:'2025-05', uses:['general','reasoning'],moe:false,desc:'Thinking mode + strong multilingual capabilities.' },
+  { name:'qwen3:32b',          family:'Qwen', paramB:32,  sizeGB:20,   vramGB:24,  contextK:128, released:'2025-05', uses:['general','reasoning'],moe:false,desc:'77.2% SWE-bench. Best all-around under 24GB.' },
+  { name:'qwen3:30b-a3b',      family:'Qwen', paramB:30,  sizeGB:18,   vramGB:18,  contextK:128, released:'2025-05', uses:['general','reasoning'],moe:true, activeB:3, desc:'MoE: only 3B active params. Runs fast with strong results.' },
+  { name:'qwen3-coder:30b',    family:'Qwen', paramB:30,  sizeGB:18,   vramGB:18,  contextK:256, released:'2025-07', uses:['coding'],        moe:true,  activeB:3, desc:'Best local coding model in 2026. 256K context, agentic tasks.' },
+
+  // ── DeepSeek ──────────────────────────────────────────────────────
+  { name:'deepseek-r1:7b',   family:'DeepSeek', paramB:7,   sizeGB:4.7,  vramGB:6,   contextK:128, released:'2025-01', uses:['reasoning'],   moe:false, desc:'Distilled reasoning model (Qwen-based). Surprisingly strong.' },
+  { name:'deepseek-r1:8b',   family:'DeepSeek', paramB:8,   sizeGB:5.0,  vramGB:6,   contextK:128, released:'2025-01', uses:['reasoning'],   moe:false, desc:'Llama-distilled R1. Good reasoning for 8GB VRAM.' },
+  { name:'deepseek-r1:14b',  family:'DeepSeek', paramB:14,  sizeGB:9.0,  vramGB:12,  contextK:128, released:'2025-01', uses:['reasoning'],   moe:false, desc:'Solid chain-of-thought reasoning for 12GB setups.' },
+  { name:'deepseek-r1:32b',  family:'DeepSeek', paramB:32,  sizeGB:19,   vramGB:24,  contextK:128, released:'2025-01', uses:['reasoning'],   moe:false, desc:'Excellent reasoning, math, and science tasks.' },
+  { name:'deepseek-r1:70b',  family:'DeepSeek', paramB:70,  sizeGB:43,   vramGB:48,  contextK:128, released:'2025-01', uses:['reasoning'],   moe:false, desc:'Near o1-level reasoning. Requires 48GB+ VRAM.' },
+  { name:'deepseek-r1:671b', family:'DeepSeek', paramB:671, sizeGB:404,  vramGB:400, contextK:128, released:'2025-01', uses:['reasoning'],   moe:true,  activeB:37, desc:'Full R1 MoE. Matches o1 on benchmarks. Needs server hardware.' },
+  { name:'deepseek-v3',      family:'DeepSeek', paramB:685, sizeGB:404,  vramGB:400, contextK:128, released:'2024-12', uses:['general','coding'],moe:true,activeB:37, desc:'DeepSeek\'s frontier general model, matches GPT-4o on many tasks.' },
+  { name:'deepseek-coder-v2:16b',family:'DeepSeek',paramB:16,sizeGB:9.1, vramGB:12,  contextK:128, released:'2024-06', uses:['coding'],      moe:true,  activeB:2.4,desc:'MoE coding model — fast and efficient for code generation.' },
+
+  // ── CodeLlama (Meta) ──────────────────────────────────────────────
+  { name:'codellama:7b',  family:'CodeLlama', paramB:7,  sizeGB:3.8,  vramGB:6,   contextK:16, released:'2023-08', uses:['coding'],  moe:false, desc:'Meta\'s first code-specialized Llama. Solid code completion.' },
+  { name:'codellama:13b', family:'CodeLlama', paramB:13, sizeGB:7.4,  vramGB:10,  contextK:16, released:'2023-08', uses:['coding'],  moe:false, desc:'Better reasoning for multi-file code tasks.' },
+  { name:'codellama:34b', family:'CodeLlama', paramB:34, sizeGB:19,   vramGB:24,  contextK:16, released:'2023-08', uses:['coding'],  moe:false, desc:'Most capable CodeLlama variant for complex projects.' },
+  { name:'codellama:70b', family:'CodeLlama', paramB:70, sizeGB:38,   vramGB:48,  contextK:32, released:'2024-01', uses:['coding'],  moe:false, desc:'Frontier coding quality from Meta. Needs large GPU.' },
+
+  // ── Other ─────────────────────────────────────────────────────────
+  { name:'smollm:135m',        family:'Other', paramB:0.135,sizeGB:0.1,  vramGB:1,   contextK:2,   released:'2024-07', uses:['edge'],   moe:false, desc:'Smallest model in Ollama. 135M params — runs anywhere.' },
+  { name:'smollm:360m',        family:'Other', paramB:0.36, sizeGB:0.2,  vramGB:1,   contextK:2,   released:'2024-07', uses:['edge'],   moe:false, desc:'Tiny model for very lightweight deployments.' },
+  { name:'smollm:1.7b',        family:'Other', paramB:1.7,  sizeGB:1.0,  vramGB:2,   contextK:2,   released:'2024-07', uses:['edge'],   moe:false, desc:'SmolLM flagship. Better than it looks at 1.7B.' },
+  { name:'nomic-embed-text',   family:'Other', paramB:0.137,sizeGB:0.3,  vramGB:1,   contextK:8,   released:'2024-02', uses:['embed'],  moe:false, desc:'Best-in-class open embeddings model for RAG pipelines.' },
+  { name:'mxbai-embed-large',  family:'Other', paramB:0.335,sizeGB:0.7,  vramGB:1,   contextK:512, released:'2024-03', uses:['embed'],  moe:false, desc:'State-of-the-art embeddings, outperforms OpenAI ada-002.' },
+  { name:'granite3.3:8b',      family:'Other', paramB:8,    sizeGB:5.1,  vramGB:6,   contextK:128, released:'2025-04', uses:['general','coding'],moe:false, desc:'IBM Granite 3.3. Strong at enterprise tasks and RAG.' },
+  { name:'orca-mini:3b',       family:'Other', paramB:3,    sizeGB:1.9,  vramGB:4,   contextK:2,   released:'2023-07', uses:['chat'],   moe:false, desc:'Early efficient model. Superseded by newer families.' },
+  { name:'starcoder2:7b',      family:'Other', paramB:7,    sizeGB:4.0,  vramGB:6,   contextK:16,  released:'2024-02', uses:['coding'], moe:false, desc:'BigCode model trained on 600+ programming languages.' },
+  { name:'starcoder2:15b',     family:'Other', paramB:15,   sizeGB:9.1,  vramGB:12,  contextK:16,  released:'2024-02', uses:['coding'], moe:false, desc:'StarCoder2 flagship. Strong multi-language code gen.' },
+];
+
+document.getElementById('totalCount').textContent = MODELS.length;
+
+let currentSort = { key: 'paramB', dir: 1 };
+let currentView = 'table';
+let ctxFilter = '';
+
+function contextLabel(k) {
+  if (k >= 1024) return { cls:'ctx-huge',  label: k >= 10240 ? '10M' : (k/1024)+'M' };
+  if (k >= 256)  return { cls:'ctx-large', label: k+'K' };
+  if (k >= 32)   return { cls:'ctx-medium',label: k+'K' };
+  return           { cls:'ctx-small',  label: k+'K' };
+}
+
+function vramLabel(gb) {
+  if (gb <= 4)   return { cls:'vram-low',  label: gb+'GB' };
+  if (gb <= 12)  return { cls:'vram-mid',  label: gb+'GB' };
+  if (gb <= 24)  return { cls:'vram-high', label: gb+'GB' };
+  return           { cls:'vram-huge', label: gb+'GB+' };
+}
+
+function familyCls(f) {
+  const m = { Llama:'llama', Mistral:'mistral', Gemma:'gemma', Phi:'phi', Qwen:'qwen', DeepSeek:'deepseek', CodeLlama:'codellama' };
+  return 'family-' + (m[f] || 'other');
+}
+
+function useCls(u) {
+  const m = { general:'use-general', coding:'use-coding', reasoning:'use-reasoning', chat:'use-chat', vision:'use-vision', embed:'use-embed', edge:'use-edge' };
+  return m[u] || 'use-general';
+}
+
+function useLabel(u) {
+  return { general:'General', coding:'Coding', reasoning:'Reasoning', chat:'Chat', vision:'Vision', embed:'Embeddings', edge:'Edge' }[u] || u;
+}
+
+function sizeBar(gb) {
+  const pct = Math.min(100, (Math.log10(gb + 0.1) + 1.1) / 3.4 * 100);
+  return `<div class="size-bar-wrap"><div class="size-bar" style="width:${pct.toFixed(0)}px"></div><span class="size-text">${gb} GB</span></div>`;
+}
+
+function paramLabel(b) {
+  if (b < 1) return (b * 1000).toFixed(0) + 'M';
+  return b % 1 === 0 ? b + 'B' : b + 'B';
+}
+
+function filteredModels() {
+  const q       = document.getElementById('search').value.toLowerCase();
+  const family  = document.getElementById('familyFilter').value;
+  const use     = document.getElementById('useFilter').value;
+  const vramMax = parseInt(document.getElementById('vramFilter').value) || Infinity;
+
+  return MODELS.filter(m => {
+    if (q && !m.name.toLowerCase().includes(q) && !m.family.toLowerCase().includes(q) && !m.desc.toLowerCase().includes(q)) return false;
+    if (family && m.family !== family) return false;
+    if (use    && !m.uses.includes(use)) return false;
+    if (m.vramGB > vramMax) return false;
+    if (ctxFilter === '128k' && m.contextK < 128)  return false;
+    if (ctxFilter === '256k' && m.contextK < 256)  return false;
+    return true;
+  }).sort((a, b) => {
+    const ka = { params:'paramB', size:'sizeGB', vram:'vramGB', context:'contextK', notes:'desc' }[currentSort.key] || currentSort.key;
+    const av = a[ka], bv = b[ka];
+    if (typeof av === 'string') return currentSort.dir * av.localeCompare(bv);
+    return currentSort.dir * (av - bv);
+  });
+}
+
+function renderTable(models) {
+  const tbody = document.getElementById('tableBody');
+  if (!models.length) {
+    tbody.innerHTML = '';
+    document.getElementById('noResults').style.display = '';
+    return;
+  }
+  document.getElementById('noResults').style.display = 'none';
+  tbody.innerHTML = models.map(m => {
+    const ctx  = contextLabel(m.contextK);
+    const vram = vramLabel(m.vramGB);
+    const moeTag = m.moe ? `<span class="moe-tag">MoE${m.activeB ? ' '+m.activeB+'B' : ''}</span>` : '';
+    const uses = m.uses.map(u => `<span class="use-tag ${useCls(u)}">${useLabel(u)}</span>`).join('');
+    return `<tr>
+      <td>${m.name}${moeTag}</td>
+      <td><span class="family-tag ${familyCls(m.family)}">${m.family}</span></td>
+      <td>${paramLabel(m.paramB)}</td>
+      <td>${sizeBar(m.sizeGB)}</td>
+      <td><span class="vram ${vram.cls}">${vram.label}</span></td>
+      <td><span class="ctx-pill ${ctx.cls}">${ctx.label}</span></td>
+      <td>${m.released}</td>
+      <td><div class="use-tags">${uses}</div></td>
+      <td style="max-width:200px;font-size:0.78rem;color:var(--text-muted)">${m.desc}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderCards(models) {
+  const grid = document.getElementById('cardsGrid');
+  if (!models.length) {
+    grid.innerHTML = '';
+    document.getElementById('noResultsCards').style.display = '';
+    return;
+  }
+  document.getElementById('noResultsCards').style.display = 'none';
+  const ctx = m => contextLabel(m.contextK);
+  const vr  = m => vramLabel(m.vramGB);
+  grid.innerHTML = models.map(m => {
+    const c = ctx(m), v = vr(m);
+    const moeTag = m.moe ? `<span class="moe-tag">MoE${m.activeB ? ' '+m.activeB+'B active' : ''}</span>` : '';
+    const uses = m.uses.map(u => `<span class="use-tag ${useCls(u)}">${useLabel(u)}</span>`).join('');
+    return `<div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-name">${m.name} ${moeTag}</div>
+          <div class="card-params"><span class="family-tag ${familyCls(m.family)}">${m.family}</span></div>
+        </div>
+      </div>
+      <div class="card-row"><span class="card-key">Parameters</span><span class="card-val">${paramLabel(m.paramB)}</span></div>
+      <div class="card-row"><span class="card-key">Disk Size</span><span class="card-val">${m.sizeGB} GB</span></div>
+      <div class="card-row"><span class="card-key">VRAM Needed</span><span class="card-val ${v.cls}">${v.label}</span></div>
+      <div class="card-row"><span class="card-key">Context</span><span class="ctx-pill ${c.cls}">${c.label}</span></div>
+      <div class="card-row"><span class="card-key">Released</span><span class="card-val">${m.released}</span></div>
+      <div class="card-uses">${uses}</div>
+      <div class="card-desc">${m.desc}</div>
+    </div>`;
+  }).join('');
+}
+
+function applyFilters() {
+  const models = filteredModels();
+  document.getElementById('resultCount').textContent = `Showing ${models.length} of ${MODELS.length} models`;
+  renderTable(models);
+  renderCards(models);
+}
+
+function sortBy(key) {
+  if (currentSort.key === key) currentSort.dir *= -1;
+  else { currentSort.key = key; currentSort.dir = 1; }
+  document.querySelectorAll('thead th').forEach(th => th.classList.remove('sorted'));
+  const headers = ['name','family','params','size','vram','context','released','uses','notes'];
+  const idx = headers.indexOf(key);
+  if (idx >= 0) document.querySelectorAll('thead th')[idx]?.classList.add('sorted');
+  applyFilters();
+}
+
+function setCtxFilter(el, val) {
+  ctxFilter = val;
+  document.querySelectorAll('#ctxFilter .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('tableView').style.display  = v === 'table' ? '' : 'none';
+  document.getElementById('cardView').style.display   = v === 'cards' ? '' : 'none';
+  document.getElementById('tableViewBtn').classList.toggle('active', v === 'table');
+  document.getElementById('cardViewBtn').classList.toggle('active', v === 'cards');
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+}
+
+applyFilters();
+</script>
+</body>
+</html>
