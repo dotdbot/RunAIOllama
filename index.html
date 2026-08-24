@@ -499,8 +499,7 @@ function filteredModels() {
     if (ctxFilter === '256k' && m.contextK < 256)  return false;
     return true;
   }).sort((a, b) => {
-    const v = k => ({ name:a=>a, family:a=>a, params:'paramB', size:'sizeGB', vram:'vramGB', context:'contextK', released:a=>a, notes:'desc' }[k]);
-    const ka = currentSort.key;
+    const ka = { params:'paramB', size:'sizeGB', vram:'vramGB', context:'contextK', notes:'desc' }[currentSort.key] || currentSort.key;
     const av = a[ka], bv = b[ka];
     if (typeof av === 'string') return currentSort.dir * av.localeCompare(bv);
     return currentSort.dir * (av - bv);
